@@ -9,7 +9,8 @@ public enum TeamTypes {
     Blue,
     Purple,
     Orange,
-    Yellow
+    Yellow,
+    Count
 }
 public class Node : MonoBehaviour
 {
@@ -152,6 +153,8 @@ public class Node : MonoBehaviour
                 currentHP = Mathf.Clamp(currentHP - 1, 0, maxHP);
                 if (currentHP == 0) {
                     currentHP = 1;
+                    GameManager.Instance.teamCounts[Team]--;
+                    GameManager.Instance.teamCounts[projectile.Team]++;
                     Team = projectile.Team;
                 }
             }

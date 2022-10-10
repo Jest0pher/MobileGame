@@ -13,6 +13,7 @@ public class GridMap : MonoBehaviour
 
     [Space]
     public List<Node> nodes;
+    public int activeNodes;
 
     [Space]
     [SerializeField] GameObject NodePrefab;
@@ -23,6 +24,7 @@ public class GridMap : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        GameManager.Instance.grid = this;
         CreateGrid();
     }
 
@@ -52,6 +54,7 @@ public class GridMap : MonoBehaviour
             gridHeight = gridWidth;
         }
 
+        activeNodes = rowCount * columnCount;
         float cellWidth = gridWidth / columnCount;
         float cellHeight = square ? cellWidth : gridHeight / rowCount;
 
@@ -63,9 +66,9 @@ public class GridMap : MonoBehaviour
             for (int j = 0; j < columnCount; j++) {
                 arrayIndices.Add(new Vector2(j, i));
                 GameObject node = Instantiate(NodePrefab, transform);
-                node.transform.position = new Vector2(x + (cellWidth/2), y - (cellHeight/2));
+                node.transform.localPosition = new Vector2(x + (cellWidth/2), y - (cellHeight/2));
                 Node nodeComp = node.GetComponent<Node>();
-                nodeComp.Team = (TeamTypes) Random.Range((int)0,(int)7);
+                nodeComp.Team = (TeamTypes) Random.Range((int)0,(int)TeamTypes.Count);
                 nodeComp.gridPos = new Vector2(j, i);
                 nodes.Add(nodeComp);
                 x += cellWidth;
@@ -120,8 +123,13 @@ public class GridMap : MonoBehaviour
 
         for (int i = 0; i < nodes.Count; i++) {
             Node node = nodes[i];
-            if (node.neighborNodes.Count == 0) {
+            if (node.neighborNodes.Count == 0)
+            {
+                activeNodes--;
                 nodes[i].gameObject.SetActive(false);
+            }
+            else {
+                GameManager.Instance.teamCounts[node.Team]++;
             }
         }
         
