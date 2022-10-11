@@ -1,14 +1,24 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.UI;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
     public float gameSpeedMultiplier;
+
+    public float GameSpeedMultiplier { get { return gameSpeedMultiplier; }
+                                       set { gameSpeedMultiplier = value;
+                                             gameSpeedSlider.value = value;
+                                           }
+                                     }
     public Dictionary<TeamTypes, int> teamCounts;
     public GridMap grid;
+    public Slider gameSpeedSlider;
+
+    [Space]
+    public ProjectilePool projectiles;
 
     [HideInInspector]
     public float adjustedTimeDelta;
@@ -28,6 +38,13 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        adjustedTimeDelta = Time.deltaTime * gameSpeedMultiplier;
+        adjustedTimeDelta = Time.deltaTime * GameSpeedMultiplier;
+        for (int i = 0; i < (int)TeamTypes.Count; i++) {
+            if (teamCounts[(TeamTypes)i] == grid.activeNodes) {
+                GameSpeedMultiplier = 0;
+                gameSpeedSlider.enabled = false;
+            }
+        }
     }
+
 }

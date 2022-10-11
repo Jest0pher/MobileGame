@@ -17,25 +17,39 @@ public class Projectile : MonoBehaviour
     public float normalSpeed = .2f;
     [Space]
     public float lifetime;
+    private float currentLifetime;
     public Node node;
+    public ProjectilePool parentPool;
     private SpriteRenderer spriteRenderer;
     // Start is called before the first frame update
     void Start()
     {
         position = transform.position;
-
+        currentLifetime = lifetime;
     }
 
     // Update is called once per frame
     void Update()
     {
-        lifetime -= GameManager.Instance.adjustedTimeDelta;
-        if (lifetime <= 0)
-            Destroy(gameObject);
+        currentLifetime -= GameManager.Instance.adjustedTimeDelta;
+        if (currentLifetime <= 0)
+            parentPool.ReturnItem(gameObject);
+            //Destroy(gameObject);
 
         position += velocityDir.normalized * normalSpeed * GameManager.Instance.adjustedTimeDelta;
 
         transform.position = position;
+    }
+
+    private void OnDisable()
+    {
+        Team = TeamTypes.Neutral;
+        velocityDir = Vector3.zero;
+    }
+
+    private void OnEnable()
+    {
+        Start();
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -45,6 +59,7 @@ public class Projectile : MonoBehaviour
                 return;
             }
         }
-        Destroy(gameObject);
+        parentPool.ReturnItem(gameObject);
+        //Destroy(gameObject);
     }
 }

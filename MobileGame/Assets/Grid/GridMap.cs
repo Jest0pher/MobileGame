@@ -24,7 +24,6 @@ public class GridMap : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        GameManager.Instance.grid = this;
         CreateGrid();
     }
 
@@ -37,16 +36,21 @@ public class GridMap : MonoBehaviour
         }
     }
 
-    void CreateGrid() {
+    public void CreateGrid() {
 
         foreach (Node obj in nodes) {
             Destroy(obj.gameObject);
         }
-        foreach (GameObject projObj in GameObject.FindGameObjectsWithTag("Projectile")) {
-            Destroy(projObj);
+        foreach (GameObject projObj in GameManager.Instance.projectiles.projectiles) {
+            projObj.SetActive(false);
+            //Destroy(projObj);
         }
 
         nodes.Clear();
+        for (int i = 0; i < (int)TeamTypes.Count; i++) {
+            GameManager.Instance.teamCounts[(TeamTypes)i] = 0;
+        }
+        GameManager.Instance.gameSpeedSlider.enabled = true;
 
         if (square)
         {

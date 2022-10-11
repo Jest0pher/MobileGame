@@ -12,6 +12,14 @@ public enum TeamTypes {
     Yellow,
     Count
 }
+
+/*public enum ProjectileType { 
+    X1 = 0,
+    X2 = 2,
+    X3 = 4,
+    X4,
+    X5
+}*/
 public class Node : MonoBehaviour
 {
     [Header("Projectile")]
@@ -97,14 +105,20 @@ public class Node : MonoBehaviour
         if (Team == TeamTypes.Neutral)
             return;
 
-        GameObject projectileObj = Instantiate(projectilePrefab, transform.position, transform.rotation);
-        Projectile projectile = projectileObj.GetComponent<Projectile>();
-        projectile.node = this;
-        projectile.Team = team;
-        int neighborIndex = Random.Range(0, neighborNodes.Count);
-        toNode = neighborNodes[neighborIndex];
-        projectile.velocityDir = toNode.transform.position - transform.position;
-        currentAmmo--;
+        //GameObject projectileObj = Instantiate(projectilePrefab, transform.position, transform.rotation);
+        GameObject projectileObj = GameManager.Instance.projectiles.GetItem();
+        if(projectileObj != null)    
+        {
+            projectileObj.transform.position = transform.position;
+            Projectile projectile = projectileObj.GetComponent<Projectile>();
+            projectile.position = transform.position;
+            projectile.node = this;
+            projectile.Team = team;
+            int neighborIndex = Random.Range(0, neighborNodes.Count);
+            toNode = neighborNodes[neighborIndex];
+            projectile.velocityDir = toNode.transform.position - transform.position;
+            currentAmmo--;
+        }
     }
 
     public static TeamTypes SetTeam(TeamTypes _team, SpriteRenderer _spriteRenderer) {
@@ -147,7 +161,14 @@ public class Node : MonoBehaviour
 
             if (projectile.Team == Team)
             {
-                currentHP = Mathf.Clamp(currentHP + 1, 0, maxHP);
+                if (currentHP == maxHP)
+                {
+                    currentAmmo = Mathf.Clamp(currentAmmo + 1, 0, maxAmmo);
+                    Shoot();
+                }
+                else { 
+                    currentHP = Mathf.Clamp(currentHP + 1, 0, maxHP);
+                }
             }
             else {
                 currentHP = Mathf.Clamp(currentHP - 1, 0, maxHP);
@@ -158,7 +179,8 @@ public class Node : MonoBehaviour
                     Team = projectile.Team;
                 }
             }
-            Destroy(projectile.gameObject);
+            GameManager.Instance.projectiles.ReturnItem(projectile.gameObject);
+            //Destroy(projectile.gameObject);
         }
     }
 }
