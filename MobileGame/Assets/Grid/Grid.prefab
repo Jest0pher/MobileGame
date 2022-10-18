@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   createGrid: 0
-  gridWidth: 100
+  gridWidth: 90
   gridHeight: 50
   rowCount: 5
   columnCount: 5

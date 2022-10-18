@@ -22,6 +22,10 @@ public class GameManager : MonoBehaviour
 
     [HideInInspector]
     public float adjustedTimeDelta;
+
+    [Space]
+    [Header("PlayerSettings")]
+    public TeamTypes team;
     private void Awake()
     {
         Instance = this;

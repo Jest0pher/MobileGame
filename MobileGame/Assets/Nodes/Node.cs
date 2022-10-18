@@ -41,7 +41,7 @@ public class Node : MonoBehaviour
 
     [Space]
     public List<Node> neighborNodes;
-    private Node toNode;
+    [SerializeField] private Node toNode;
 
     //Variables for runtime
     private int currentAmmo;
@@ -52,6 +52,7 @@ public class Node : MonoBehaviour
     
     [Space]
     public SpriteRenderer spriteRenderer;
+    public CircleCollider2D touchCollider;
 
     [Space]
     public Vector2 gridPos;
@@ -67,6 +68,7 @@ public class Node : MonoBehaviour
         currentFireRateTimer = fireRate;
         currentRechargeRateTimer = rechargeRate;
         currentHP = Team == TeamTypes.Neutral ? Random.Range(1, maxHP+1) : maxHP;
+        toNode = neighborNodes[0];
 
         //int randomTeam = Random.Range(0, 6);
         //team = SetTeam((TeamTypes)randomTeam, spriteRenderer);
@@ -114,8 +116,6 @@ public class Node : MonoBehaviour
             projectile.position = transform.position;
             projectile.node = this;
             projectile.Team = team;
-            int neighborIndex = Random.Range(0, neighborNodes.Count);
-            toNode = neighborNodes[neighborIndex];
             projectile.velocityDir = toNode.transform.position - transform.position;
             currentAmmo--;
         }
@@ -182,6 +182,21 @@ public class Node : MonoBehaviour
             GameManager.Instance.projectiles.ReturnItem(projectile.gameObject);
             //Destroy(projectile.gameObject);
         }
+    }
+
+    public Node GetNeighborFromDirection(Vector2 dir) {
+        dir.Set((Mathf.Abs(dir.x) < 1 && Mathf.Abs(dir.x) > 0) ? dir.x / Mathf.Abs(dir.x) : dir.x, -1 * ((Mathf.Abs(dir.y) < 1 && Mathf.Abs(dir.y) > 0) ? dir.y / Mathf.Abs(dir.y) : dir.y));
+        int index = (int)(gridPos.x + dir.x) + GameManager.Instance.grid.columnCount * (int)(gridPos.y + dir.y);
+        Node potentialNeighbor = GameManager.Instance.grid.nodes[index];
+        if (neighborNodes.Contains(potentialNeighbor)){
+            return potentialNeighbor;
+        }
+        return null;
+    }
+
+    public void SetToNode(Node _toNode) {
+        if (neighborNodes.Contains(_toNode))
+            toNode = _toNode;
     }
 }
 

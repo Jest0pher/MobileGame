@@ -99,11 +99,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec767a20974c73740972ec2e758a6ec2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  velocity: {x: 0, y: -0.1, z: 0}
+  velocityDir: {x: 0, y: 0, z: 0}
   position: {x: 0, y: 0, z: 0}
   normalSpeed: 30
   lifetime: 4
   node: {fileID: 0}
+  parentPool: {fileID: 0}
 --- !u!58 &3933793381613815855
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -139,5 +140,5 @@ Rigidbody2D:
   m_Material: {fileID: 0}
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 0

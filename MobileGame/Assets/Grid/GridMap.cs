@@ -51,6 +51,7 @@ public class GridMap : MonoBehaviour
             GameManager.Instance.teamCounts[(TeamTypes)i] = 0;
         }
         GameManager.Instance.gameSpeedSlider.enabled = true;
+        GameManager.Instance.gameSpeedSlider.value = 1;
 
         if (square)
         {
@@ -70,6 +71,7 @@ public class GridMap : MonoBehaviour
             for (int j = 0; j < columnCount; j++) {
                 arrayIndices.Add(new Vector2(j, i));
                 GameObject node = Instantiate(NodePrefab, transform);
+                node.gameObject.name = "Node (" + j.ToString() + "," + i.ToString() + ")";
                 node.transform.localPosition = new Vector2(x + (cellWidth/2), y - (cellHeight/2));
                 Node nodeComp = node.GetComponent<Node>();
                 nodeComp.Team = (TeamTypes) Random.Range((int)0,(int)TeamTypes.Count);
