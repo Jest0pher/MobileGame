@@ -252,6 +252,7 @@ MonoBehaviour:
   rechargeRate: 2
   maxHP: 5
   neighborNodes: []
+  toNode: {fileID: 0}
   currentHP: 0
   spriteRenderer: {fileID: 1895894580168586691}
   touchCollider: {fileID: 524135099054232750}

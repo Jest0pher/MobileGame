@@ -9,6 +9,8 @@ public class InputManager : MonoBehaviour
     public Vector2 worldTouch;
     public bool canTouch = true;
     public Node selectedNode;
+    public float dashedLineWidth = .75f;
+    [SerializeField] GameObject dashedLinePrefab;
     
     [Space]
     [Header("Testing")]
@@ -16,6 +18,9 @@ public class InputManager : MonoBehaviour
     [SerializeField] private float theta;
     [SerializeField] private float newTheta;
     [SerializeField] private List<Vector2> availableDirections;
+    [SerializeField] private Node targetNode;
+    [SerializeField] private GameObject spawnedLine;
+    [SerializeField] private LineRenderer dashedLineRenderer;
 
     private void Start()
     {
@@ -43,7 +48,10 @@ public class InputManager : MonoBehaviour
                             for (int i = 0; i < selectedNode.neighborNodes.Count; i++) {
                                 availableDirections.Add((selectedNode.neighborNodes[i].transform.position - selectedNode.transform.position).normalized);
                             }
-                            print(node.Team);
+                            spawnedLine = Instantiate(dashedLinePrefab, transform);
+                            dashedLineRenderer = spawnedLine.GetComponent<LineRenderer>();
+
+                            PointToClosestNode();
                             break;
                         }
                     }
@@ -53,53 +61,8 @@ public class InputManager : MonoBehaviour
             {
                 if (selectedNode)
                 {
-                    touchDelta = (Camera.main.ScreenToWorldPoint(Input.GetTouch(0).position) - selectedNode.transform.position).normalized;
-                    float angleStep = 45.0f;
-                    float angleStepR = angleStep * Mathf.Deg2Rad;
-                
-                    theta = Mathf.Atan(touchDelta.y / touchDelta.x) + angleStepR/2;
+                    PointToClosestNode();
 
-                    if (touchDelta.x < 0)
-                    {
-                        theta += Mathf.PI;
-                    }
-                    else { 
-                        if (touchDelta.y < 0)
-                        {
-                            theta += 2 * Mathf.PI;
-                        }
-                    }
-
-                    int closestDirIndex = 0;
-                    float shortestTheta = 2 * Mathf.PI;
-                    for(int i = 0; i < availableDirections.Count; i++) {
-                        float dirTheta = Mathf.Atan(availableDirections[i].y / availableDirections[i].x) + angleStepR / 2;
-                        if (availableDirections[i].x < 0)
-                        {
-                            dirTheta += Mathf.PI;
-                        }
-                        else
-                        {
-                            if (availableDirections[i].y < 0)
-                            {
-                                dirTheta += 2 * Mathf.PI;
-                            }
-                        }
-
-                        if (theta > Mathf.PI * 2) {
-                            theta -= Mathf.PI * 2;
-                        }
-                        float thetaDiff = Mathf.Abs(dirTheta - theta);
-                        if (thetaDiff < shortestTheta)
-                        {
-                            shortestTheta = thetaDiff;
-                            closestDirIndex = i;
-                        }
-                    }
-                    //int steps = (int)(theta / angleStep);
-                    //newTheta = angleStepR * steps;
-                    newTouchDir = availableDirections[closestDirIndex];
-                    
                     /*
                     //Debug
                     Vector2 debugDir = new Vector2();
@@ -118,13 +81,79 @@ public class InputManager : MonoBehaviour
         }
         else {
             if (selectedNode) {
-                Node getNode = selectedNode.GetNeighborFromDirection(newTouchDir);
-                selectedNode.SetToNode(getNode);
+                selectedNode.SetToNode(targetNode);
             }
                 
             canTouch = true;
             selectedNode = null;
+            targetNode = null;
+            Destroy(spawnedLine);
             availableDirections.Clear();
         }
+    }
+
+    void PointToClosestNode() {
+        touchDelta = (Camera.main.ScreenToWorldPoint(Input.GetTouch(0).position) - selectedNode.transform.position).normalized;
+        float angleStep = 45.0f;
+        float angleStepR = angleStep * Mathf.Deg2Rad;
+
+        theta = Mathf.Atan(touchDelta.y / touchDelta.x) + angleStepR / 2;
+
+        if (touchDelta.x < 0)
+        {
+            theta += Mathf.PI;
+        }
+        else
+        {
+            if (touchDelta.y < 0)
+            {
+                theta += 2 * Mathf.PI;
+            }
+        }
+
+        int closestDirIndex = 0;
+        float shortestTheta = 2 * Mathf.PI;
+        for (int i = 0; i < availableDirections.Count; i++)
+        {
+            float dirTheta = Mathf.Atan(availableDirections[i].y / availableDirections[i].x) + angleStepR / 2;
+            if (availableDirections[i].x < 0)
+            {
+                dirTheta += Mathf.PI;
+            }
+            else
+            {
+                if (availableDirections[i].y < 0)
+                {
+                    dirTheta += 2 * Mathf.PI;
+                }
+            }
+
+            if (theta > Mathf.PI * 2)
+            {
+                theta -= Mathf.PI * 2;
+            }
+            float thetaDiff = Mathf.Abs(dirTheta - theta);
+            if (thetaDiff < shortestTheta)
+            {
+                shortestTheta = thetaDiff;
+                closestDirIndex = i;
+            }
+        }
+
+        newTouchDir = availableDirections[closestDirIndex];
+        targetNode = selectedNode.GetNeighborFromDirection(newTouchDir);
+
+        if (targetNode.toNode == selectedNode && targetNode.Team == selectedNode.Team)
+        {
+            targetNode.SetToNode(null);
+        }
+
+        Vector3[] positions = { selectedNode.transform.position, targetNode.transform.position };
+        for (int i = 0; i < 2; i++)
+        {
+            positions[i].Set(positions[i].x, positions[i].y, .05f);
+        }
+        dashedLineRenderer.SetPositions(positions);
+        dashedLineRenderer.SetWidth(dashedLineWidth, dashedLineWidth);
     }
 }

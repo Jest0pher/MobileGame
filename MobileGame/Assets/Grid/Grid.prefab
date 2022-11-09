@@ -46,12 +46,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   createGrid: 0
   gridWidth: 90
-  gridHeight: 50
+  gridHeight: 90
   rowCount: 5
   columnCount: 5
-  square: 1
+  squareGrid: 0
+  portrait: 1
   nodes: []
   activeNodes: 0
+  gridRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 0
+    height: 0
   NodePrefab: {fileID: 5283332380324034135, guid: e57b1c124dd12ec4094d1595652ebdae, type: 3}
   LinePrefab: {fileID: 4035506525556300968, guid: e5493b9c64f84d84b8cfbf8694d8f85e, type: 3}
   lineWidth: 0.3
+  maxConnections: 6

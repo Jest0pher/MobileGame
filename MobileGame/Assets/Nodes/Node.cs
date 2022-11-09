@@ -26,7 +26,7 @@ public class Node : MonoBehaviour
     [SerializeField] GameObject projectilePrefab;
     [Space]
     [Header("Team")]
-    private TeamTypes team;
+    [SerializeField] private TeamTypes team;
     public TeamTypes Team { 
         get { return team; }
         set { team = SetTeam(value, spriteRenderer); }
@@ -41,7 +41,8 @@ public class Node : MonoBehaviour
 
     [Space]
     public List<Node> neighborNodes;
-    [SerializeField] private Node toNode;
+    public Node toNode;
+    public float projectileScale;
 
     //Variables for runtime
     private int currentAmmo;
@@ -61,6 +62,30 @@ public class Node : MonoBehaviour
     [Range(0, 6)]
     public int teamNum;
     private int prevNum;
+    public Node() { 
+    
+    }
+
+    public Node(Node _node) {
+        projectilePrefab = _node.projectilePrefab;
+        Team = _node.Team;
+        maxAmmo = _node.maxAmmo;
+        fireRate = _node.fireRate;
+        rechargeRate = _node.rechargeRate;
+        maxHP = _node.maxHP;
+        neighborNodes = new List<Node>(_node.neighborNodes);
+        toNode = _node.toNode;
+        projectileScale = _node.projectileScale;
+        currentAmmo = _node.currentAmmo;
+        currentFireRateTimer = _node.currentFireRateTimer;
+        currentRechargeRateTimer = _node.currentRechargeRateTimer;
+        currentHP = _node.currentHP;
+        spriteRenderer = _node.spriteRenderer;
+        touchCollider = _node.touchCollider;
+        gridPos = _node.gridPos;
+        teamNum = _node.teamNum;
+        prevNum = _node.prevNum;
+    }
     // Start is called before the first frame update
     void Start()
     {
@@ -68,7 +93,7 @@ public class Node : MonoBehaviour
         currentFireRateTimer = fireRate;
         currentRechargeRateTimer = rechargeRate;
         currentHP = Team == TeamTypes.Neutral ? Random.Range(1, maxHP+1) : maxHP;
-        toNode = neighborNodes[0];
+        toNode = null;
 
         //int randomTeam = Random.Range(0, 6);
         //team = SetTeam((TeamTypes)randomTeam, spriteRenderer);
@@ -76,7 +101,6 @@ public class Node : MonoBehaviour
         teamNum = (int)team;
         prevNum = teamNum;
     }
-
     // Update is called once per frame
     void Update()
     {
@@ -107,11 +131,16 @@ public class Node : MonoBehaviour
         if (Team == TeamTypes.Neutral)
             return;
 
+        if (toNode == null)
+            return;
+
+
         //GameObject projectileObj = Instantiate(projectilePrefab, transform.position, transform.rotation);
         GameObject projectileObj = GameManager.Instance.projectiles.GetItem();
         if(projectileObj != null)    
         {
             projectileObj.transform.position = transform.position;
+            projectileObj.transform.localScale = new Vector3(projectilePrefab.transform.localScale.x * projectileScale, projectilePrefab.transform.localScale.y * projectileScale, 1);
             Projectile projectile = projectileObj.GetComponent<Projectile>();
             projectile.position = transform.position;
             projectile.node = this;
@@ -195,7 +224,7 @@ public class Node : MonoBehaviour
     }
 
     public void SetToNode(Node _toNode) {
-        if (neighborNodes.Contains(_toNode))
+        if (neighborNodes.Contains(_toNode) || _toNode == null)
             toNode = _toNode;
     }
 }
